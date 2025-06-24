@@ -1,47 +1,104 @@
 #include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <time.h>
+
+#define TAM 9
+
+bool podeColocar(int matriz[TAM][TAM], int linha, int coluna, int num)
+{
+  for (int i = 0; i < TAM; i++)
+  {
+    if (matriz[linha][i] == num || matriz[i][coluna] == num)
+    {
+      return false;
+    }
+  }
+
+  int blocoInicioLinha = linha - linha % 3;
+  int blocoInicioColuna = coluna - coluna % 3;
+
+  for (int i = 0; i < 3; i++)
+  {
+    for (int j = 0; j < 3; j++)
+    {
+      if (matriz[blocoInicioLinha + i][blocoInicioColuna + j] == num)
+      {
+        return false;
+      }
+    }
+  }
+
+  return true;
+}
+
+void embaralhar(int *numeros)
+{
+  for (int i = 0; i < TAM; i++)
+  {
+    numeros[i] = i + 1;
+  }
+  for (int i = TAM - 1; i > 0; i--)
+  {
+    int j = rand() % (i + 1);
+    int temp = numeros[i];
+    numeros[i] = numeros[j];
+    numeros[j] = temp;
+  }
+}
+
+bool preencherSudoku(int matriz[TAM][TAM], int linha, int coluna)
+{
+  if (linha == TAM)
+    return true;
+  if (coluna == TAM)
+    return preencherSudoku(matriz, linha + 1, 0);
+
+  int numeros[TAM];
+  embaralhar(numeros);
+
+  for (int i = 0; i < TAM; i++)
+  {
+    int num = numeros[i];
+    if (podeColocar(matriz, linha, coluna, num))
+    {
+      matriz[linha][coluna] = num;
+      if (preencherSudoku(matriz, linha, coluna + 1))
+        return true;
+      matriz[linha][coluna] = 0; // backtrack
+    }
+  }
+
+  return false;
+}
+
+// Imprime a matriz
+void imprimirMatriz(int matriz[TAM][TAM])
+{
+  for (int i = 0; i < TAM; i++)
+  {
+    for (int j = 0; j < TAM; j++)
+    {
+      printf("%d ", matriz[i][j]);
+    }
+    printf("\n");
+  }
+}
 
 int main()
 {
-  int matriz[9][9] = {
-      {1, 1, 1, 2, 2, 2, 3, 3, 3},
-      {1, 1, 1, 2, 2, 2, 3, 3, 3},
-      {1, 1, 1, 2, 2, 2, 3, 3, 3},
-      {4, 4, 4, 5, 5, 5, 6, 6, 6},
-      {4, 4, 4, 5, 5, 5, 6, 6, 6},
-      {4, 4, 4, 5, 5, 5, 6, 6, 6},
-      {7, 7, 7, 8, 8, 8, 9, 9, 9},
-      {7, 7, 7, 8, 8, 8, 9, 9, 9},
-      {7, 7, 7, 8, 8, 8, 9, 9, 9},
-  };
+  int matriz[TAM][TAM] = {0};
 
-  int submatriz[3][3];
+  srand(time(NULL));
 
-  for (int i = 0; i <= 6; i += 3) // Avança de 3 em 3 linhas
+  if (preencherSudoku(matriz, 0, 0))
   {
-    for (int j = 0; j <= 6; j += 3) // Avança de 3 em 3 colunas
-    {
-      // Extrair submatriz 3x3 a partir da posição (i,j)
-      for (int x = 0; x < 3; x++)
-      {
-        for (int y = 0; y < 3; y++)
-        {
-          submatriz[x][y] = matriz[i + x][j + y];
-        }
-      }
-
-      // Imprimir a submatriz extraída
-
-      for (int x = 0; x < 3; x++)
-      {
-        for (int y = 0; y < 3; y++)
-        {
-          printf("%d ", submatriz[x][y]);
-        }
-        printf("  ");
-      }
-      printf("\n");
-    }
-    printf("\n");
+    printf("gerado :\n\n");
+    imprimirMatriz(matriz);
+  }
+  else
+  {
+    printf("Erro .\n");
   }
 
   return 0;

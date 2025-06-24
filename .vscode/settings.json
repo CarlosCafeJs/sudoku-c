@@ -64,6 +64,7 @@
     "**/templates/*": "django-txt",
     "**/requirements{/**,*}.{txt,in}": "pip-requirements",
     ".env*": "dotenv",
-    "stdbool.h": "c"
+    "stdbool.h": "c",
+    "stdio.h": "c"
   }
 }
